@@ -1,18 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class FinishTrigger : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public UnityEvent Finish = new UnityEvent();
+    private void OnTriggerEnter(Collider other)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        if (other.TryGetComponent<Player>(out Player player))
+        {
+            //Time.timeScale = 0f;
+            Finish.Invoke();
+        }
     }
 }

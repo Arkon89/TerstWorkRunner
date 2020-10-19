@@ -7,13 +7,16 @@ using UnityEngine;
 public class FrontMotor : MonoBehaviour
 {
     [SerializeField] private float _moveSpeed;
+    [SerializeField] private float _acceleration = 1f;
     private Rigidbody _body;
+    private Animator _animator;
 
     private bool _letRun = true;
 
     private void Awake()
     {
         _body = GetComponent<Rigidbody>();
+        _animator = GetComponentInChildren<Animator>();
     }
     private void FixedUpdate()
     {
@@ -25,7 +28,7 @@ public class FrontMotor : MonoBehaviour
     private bool CheckGround()
     {
         Vector3 newPosition = transform.position;
-        newPosition.z += _moveSpeed;
+        newPosition.z += _moveSpeed / 10f;
 
         if (Physics.Raycast(newPosition, Vector3.down, out RaycastHit hitInfo))
         {
@@ -44,17 +47,20 @@ public class FrontMotor : MonoBehaviour
         }
     }
 
-    private void Move()
-    {
-        Vector3 newPosition = transform.position;
-        newPosition = Vector3.Lerp(transform.position, transform.position + transform.forward, _moveSpeed);
-        transform.position = newPosition;
-    }
+    // private void Move()
+    // {
+    //     Vector3 newPosition = transform.position;
+    //     newPosition = Vector3.Lerp(transform.position, transform.position + transform.forward, _moveSpeed);
+    //     transform.position = newPosition;
+
+    // }
 
     private void RigidbodyMove()
     {
-        Debug.Log("RigidbodyMove()");
-        _body.AddForce(transform.forward * _moveSpeed, ForceMode.VelocityChange);
+        Vector3 targetVelocity = _body.velocity;
+        targetVelocity.z = _moveSpeed;
+        _body.velocity = Vector3.Lerp(_body.velocity, targetVelocity, _acceleration);
+        _animator.SetFloat("runSpeed", _body.velocity.z);
     }
 
     private void OnTriggerStay(Collider other)
@@ -62,7 +68,7 @@ public class FrontMotor : MonoBehaviour
         if (other.TryGetComponent<TurnTrigger>(out TurnTrigger turnTrigger))
         {
             _letRun = false;
-            _body.AddForce(transform.forward * _moveSpeed / 20f, ForceMode.VelocityChange);
+            // _body.AddForce(transform.forward * _moveSpeed / 20f, ForceMode.VelocityChange);
         }
 
         if (other.TryGetComponent<StrateEnterTrigger>(out StrateEnterTrigger strateEnterTrigger))

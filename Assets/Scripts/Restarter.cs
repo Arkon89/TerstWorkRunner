@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class Restarter : MonoBehaviour
 {
-    private bool _gameOwer;
+    private bool _gameOwer, _finish;
     void Start()
     {
 
@@ -14,6 +14,9 @@ public class Restarter : MonoBehaviour
         {
             barrier.PlayerCatched.AddListener(GameOwer);
         }
+
+        FinishTrigger finish = FindObjectOfType<FinishTrigger>();
+        finish.Finish.AddListener(Finish);
     }
 
     public void GameOwer()
@@ -28,6 +31,16 @@ public class Restarter : MonoBehaviour
     IEnumerator RestartLevel()
     {
         yield return new WaitForSecondsRealtime(2f);
-        SceneManager.LoadSceneAsync(0, LoadSceneMode.Single);
+        SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
+
+    public void Finish()
+    {
+        if (!_finish)
+        {
+            StartCoroutine(RestartLevel());
+            _finish = true;
+        }
+    }
+
 }
